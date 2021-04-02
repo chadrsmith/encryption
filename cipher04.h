@@ -12,26 +12,33 @@
 
 using namespace std;
 
+static char MATRIX_1[25] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','r','s','t','u','v','w','x','y','z'};
+static char MATRIX_2[25] = {'t','h','e','q','u','i','k','b','r','o','n','f','o','x','j','u','m','p','s','o','v','e','r','t','h'};
+static char MATRIX_3[25] = {'z','y','x','w','v','u','t','s','r','q','p','o','n','m','l','k','i','h','g','f','e','d','c','b','a'};
+static char MATRIX_4[25] = {'a','b','c','d','e','f','g','h','i','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 /********************************************************************
  * CLASS
  *******************************************************************/
 class Cipher04 : public Cipher
 {
 private:
-   char matrix1[25] = {'a','b','c','d','e','f','g','h','i','j','k','l',
-                       'm','n','o','p','r','s','t','u','v','w','x','y','z'};
-   char matrix2[25] = {'t','h','e','q','u','i','k','b','r','o','n',
-                       'f','o','x','j','u','m','p','s','o','v','e','r','t','h'};
-   char matrix3[25] = {'z','y','x','w','v','u','t','s','r','q','p','o','n',
-                       'm','l','k','i','h','g','f','e','d','c','b','a'};
-   char matrix4[25] = {'a','b','c','d','e','f','g','h','i','k','l',
-                       'm','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+   char *matrix1;
+   char *matrix2;
+   char *matrix3;
+   char *matrix4;
+
 public:
    virtual std::string getPseudoAuth()  { return "Chad Smith"; }
    virtual std::string getCipherName()  { return "Foursquare"; }
    virtual std::string getEncryptAuth() { return "Charles Rich"; }
    virtual std::string getDecryptAuth() { return "decrypt author"; }
-
+   
+   Cipher04() {
+      matrix1 = MATRIX_1;
+      matrix2 = MATRIX_2;
+      matrix3 = MATRIX_3;
+      matrix4 = MATRIX_4; 
+   }
    /***********************************************************
     * GET CIPHER CITATION
     * Returns the citation from which we learned about the cipher
