@@ -13,11 +13,11 @@
 using namespace std;
 
 static char MATRIX_1[25] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','r','s','t','u','v','w','x','y','z'};
-static char MATRIX_2[25] = {'t','h','e','q','u','i','k','b','r','o','n','f','o','x','j','u','m','p','s','o','v','e','r','t','h'};
-static char MATRIX_3[25] = {'z','y','x','w','v','u','t','s','r','q','p','o','n','m','l','k','i','h','g','f','e','d','c','b','a'};
-static char MATRIX_4[25] = {'a','b','c','d','e','f','g','h','i','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+static char MATRIX_2[25] = {'z','y','x','w','v','u','t','s','r','p','o','n','m','l','k','j','i','h','g','f','e','d','c','b','a'};
+static char MATRIX_3[25] = {'z','y','x','w','v','u','t','s','r','p','o','n','m','l','k','j','i','h','g','f','e','d','c','b','a'};
+static char MATRIX_4[25] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','r','s','t','u','v','w','x','y','z'};
 /********************************************************************
- * CLASS
+ * CLASS Cipher: FOUR BY FOUR Cipher
  *******************************************************************/
 class Cipher04 : public Cipher
 {
@@ -29,15 +29,15 @@ private:
 
 public:
    virtual std::string getPseudoAuth()  { return "Chad Smith"; }
-   virtual std::string getCipherName()  { return "Foursquare"; }
+   virtual std::string getCipherName()  { return "Foursquare Cipher"; }
    virtual std::string getEncryptAuth() { return "Charles Rich"; }
-   virtual std::string getDecryptAuth() { return "decrypt author"; }
-   
+   virtual std::string getDecryptAuth() { return "Doug Barlow"; }
+
    Cipher04() {
       matrix1 = MATRIX_1;
-      matrix2 = MATRIX_2;
-      matrix3 = MATRIX_3;
-      matrix4 = MATRIX_4; 
+      matrix2 = new char[25];
+      matrix3 = new char[25];
+      matrix4 = MATRIX_4;
    }
    /***********************************************************
     * GET CIPHER CITATION
@@ -48,12 +48,11 @@ public:
       return std::string("L. Rombert, “Four Square Cipher,” Privacy Canada, 16-Mar-2021. [Online]. Available: https://privacycanada.net/classical-encryption/four-square-cipher/. [Accessed: 02-Apr-2021]. ");
    }
 
-   
+
    /**********************************************************
    * GETINDEX
    **********************************************************/
-   
-   virtual int getIndex(char character, char *matrix) 
+   virtual int getIndex(char character, char *matrix)
       {
          int index;
          for(int x = 0; x < 25; x++){
@@ -75,11 +74,88 @@ public:
    /**********************************************************
    * GETYCOORDINATE
    **********************************************************/
-
    virtual int getYCoordinate(int index) {
          return floor((index / 5));
       }
 
+   /**********************************************************
+   * GETENCRYPTEDLETTER
+   **********************************************************/
+   virtual int getEncryptedLetter(int x, int y, char *matrix) {
+        int index = x + y;
+        return matrix[index];
+    }
+
+   /**********************************************************
+   * POPULATEMATRIX
+   **********************************************************/
+   virtual void populateMatrix(std::string password) {
+        std::string key1 = password;
+        std::string key2 = password;
+        int splitIndex = password.find(' ');
+        if (splitIndex != -1){
+            key1 = password.substr(0,splitIndex);
+            key2 = password.substr(splitIndex,(password.length() - splitIndex));
+        }
+
+        //Remove non alpha characters from keys.
+        key1.erase(remove_if(key1.begin(), key1.end(), [](char c) { return !isalpha(c); } ), key1.end());
+        key2.erase(remove_if(key2.begin(), key2.end(), [](char c) { return !isalpha(c); } ), key2.end());
+
+        std::string usedChars1 = "";
+        std::string usedChars2 = "";
+
+        int iteratorM1 = 0;
+        int iteratorM2 = 0;
+
+        for (int i = 0; i < 25; i++){
+            //Add characters from key 1 into matrix 2.
+            if (iteratorM1 < key1.length()){
+                //Skip characters already in matrix
+                while (iteratorM1 < key1.length() && usedChars1.find(key1.at(iteratorM1)) != std::string::npos) {
+                    iteratorM1++;
+                }
+                if (iteratorM1 < key1.length()){
+                    this->matrix2[i] = key1.at(iteratorM1);
+                    usedChars1 += key1.at(iteratorM1);
+                }
+            }
+            //fill out remaining spaces in matrix from MATRIX_2
+            if (iteratorM1 >= key1.length()){
+                //Skip characters already in matrix
+                while (usedChars1.find(MATRIX_2[iteratorM1 - key1.length()]) != std::string::npos) {
+                    iteratorM1++;
+                }
+                this->matrix2[i] = MATRIX_2[iteratorM1 - key1.length()];
+                usedChars1 += MATRIX_2[iteratorM1 - key1.length()];
+            }
+            iteratorM1++;
+
+            //Add characters from key 2 into matrix3.
+            if (iteratorM2 < key2.length()){
+                //Skip characters already in matrix
+                while (iteratorM2 < key2.length() && usedChars2.find(key2.at(iteratorM2)) != std::string::npos) {
+                    iteratorM2++;
+                }
+                if (iteratorM2 < key2.length()){
+                    this->matrix3[i] = key2.at(iteratorM2);
+                    usedChars2 += key2.at(iteratorM2);
+                }
+            }
+            //fill out remaining spaces in matrix from MATRIX_3
+            if (iteratorM2 >= key2.length()) {
+                //Skip characters already in matrix
+                while (usedChars2.find(MATRIX_3[iteratorM2 - key2.length()])!= std::string::npos) {
+                    iteratorM2++;
+                }
+                this->matrix3[i] = MATRIX_3[iteratorM2 - key2.length()];
+                usedChars2 += MATRIX_3[iteratorM2 - key2.length()];
+            }
+            iteratorM2++;
+        }
+
+        return ;
+    }
    /**********************************************************
     * GET PSEUDOCODE
     * Returns the pseudocode as a string to be used by the caller.
@@ -109,11 +185,11 @@ public:
        str += "    y1 = getYCoordinate(index1) \n";
        str += "    x2 = getXCoordinate(index2) \n";
        str += "    y2 = getYCoordinate(index2) \n";
-       str += "    cipherText += matrix2[x2 + y1] \n";
-       str += "    cipherText += matrix3[x1 + y2] \n";
+       str += "    cipherText += matrix2[x2 + (y1 * 5)] \n";
+       str += "    cipherText += matrix3[x1 + (y2 * 5)] \n";
        str += "RETURN cipherText; \n";
        str += "\n";
-       
+
        // Helper function
        str += "// Gets the index of the character in the matrix \n";
        str += "INT getIndex(character, matrix) { \n";
@@ -125,7 +201,7 @@ public:
        str += "    return index \n";
        str += "} \n";
        str += "\n";
-       
+
        // Helper Function
        str += " // get y-coordinate of the index in a 5 x 5 matrix \n";
        str += "INT getXCoordinate(index) => { \n";
@@ -139,12 +215,13 @@ public:
        str += "    return floor((index / 5)) \n";
        str += "} \n";
        str += "\n";
-       str += "// Returns the index for the encryption table \n";
+
+       str += "// Returns the index for the encryption table \\n";
        str += "function getEncryptedLetter(x, y, matrix) => { \n";
        str += "    int index = y + x; \n";
        str += "    return matrix[index] \n";
        str += "} \n";
-   
+
        str += "The Decrypt psuedocode \n";
        str += "function decryptFourByFour(encryptedPassword) => {\n";
        str += "decryptedText; \n";
@@ -158,14 +235,12 @@ public:
        str += "    y1 = getYcoordinate(index1) \n";
        str += "    x2 = getXCoordinate(index1) \n";
        str += "    y2 = getYCoordinate(index2) \n";
-       str +=  "    decryptedText += getEncryptedLetter(x1, y1, matrix1) \n";
-       str += "    decryptedText += getEncryptedLetter(x2, y2, matrix4) \n";
+       str +=  "    decryptedText += matrix1[(x1 + (y1* 5)) \n";
+       str += "    decryptedText += matrix4[(x2 + (y2 * 5)]  \n";
        str += "    return decryptedText; \n";
        str += "}\n";
       return str;
    }
-
-
 
    /**********************************************************
     * ENCRYPT
@@ -174,16 +249,20 @@ public:
    virtual std::string encrypt(const std::string & plainText,
                                const std::string & password)
   {
+      populateMatrix(password);
+
       std::string cipherText = plainText;
-      
-      // Filters out spaces in the string 
-      std::string::iterator end_pos = std::remove(cipherText.begin(), cipherText.end(), ' ');
-      cipherText.erase(end_pos, cipherText.end());
-      
+      std::transform(cipherText.begin(), cipherText.end(), cipherText.begin(),
+            [](unsigned char c){ return std::tolower(c); });
+
+      // Filters out spaces in the string
+      cipherText.erase(remove_if(cipherText.begin(), cipherText.end(),
+                    [](char c) { return !isalpha(c); } ), cipherText.end());
+
       // The text must be even for the encryption to work. if odd add Z at the end
       if (cipherText.length() % 2 != 0)
          cipherText += 'z';
-      
+
       string encrypted = "";
       for(int i = 0; i < cipherText.length(); i += 2) {
          int index1 = getIndex(cipherText[i], this->matrix1);
@@ -193,8 +272,8 @@ public:
          int x2 = getXCoordinate(index2);
          int y2 = getYCoordinate(index2);
 
-         encrypted += this->matrix2[x2+y1];
-         encrypted += this->matrix3[x1+y2];
+         encrypted += this->matrix2[x2+(y1 * 5)];
+         encrypted += this->matrix3[x1+(y2 * 5)];
          }
 
       return encrypted;
@@ -203,14 +282,28 @@ public:
 
    /**********************************************************
     * DECRYPT
-    * TODO: ADD description
+    * TODO: Uses the password to populate the cipher matrix
+    *       and decrypt the text.
     **********************************************************/
    virtual std::string decrypt(const std::string & cipherText,
                                const std::string & password)
    {
-      std::string plainText = cipherText;
-      // TODO - Add your code here
-      return plainText;
+        populateMatrix(password);
+
+        std::string plainText = "";
+
+        for (int i = 0; i < cipherText.length(); i+=2){
+
+            int index1 = getIndex(cipherText[i], this->matrix2);
+            int index2 = getIndex(cipherText[i + 1], this->matrix3);
+            int x1 = getXCoordinate(index2);
+            int y1 = getYCoordinate(index1);
+            int x2 = getXCoordinate(index1);
+            int y2 = getYCoordinate(index2);
+            plainText += getEncryptedLetter(x1, (y1 * 5), this->matrix1);
+            plainText += getEncryptedLetter(x2, (y2 * 5), this->matrix4);
+        }
+        return plainText;
    }
 };
 

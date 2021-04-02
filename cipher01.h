@@ -116,7 +116,7 @@ public:
       std::string tempCipher = cipherText;
       tempCipher.erase(std::remove(tempCipher.begin(), tempCipher.end(), '.'), tempCipher.end());
       float row = password.length();
-      int col = std::ceil(float(cipherText.length())/row);
+      int col = ceil(float(cipherText.length())/row);
       int text_length = tempCipher.length() - row;
       if (text_length < 0) {
         text_length = -text_length;
