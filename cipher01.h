@@ -18,7 +18,7 @@ public:
    virtual std::string getPseudoAuth()  { return "Ryan Budd"; }
    virtual std::string getCipherName()  { return "Transport Cipher"; }
    virtual std::string getEncryptAuth() { return "encrypt author"; }
-   virtual std::string getDecryptAuth() { return "decrypt author"; }
+   virtual std::string getDecryptAuth() { return "Chad Smith"; }
 
    /***********************************************************
     * GET CIPHER CITATION
@@ -109,12 +109,43 @@ public:
     * DECRYPT
     * TODO: ADD description
     **********************************************************/
-   virtual std::string decrypt(const std::string & cipherText,
+    virtual std::string decrypt(const std::string & cipherText,
                                const std::string & password)
    {
-      std::string plainText = cipherText;
-      // TODO - Add your code here
-
+      //std::string plainText = cipherText;
+      std::string tempCipher = cipherText;
+      tempCipher.erase(std::remove(tempCipher.begin(), tempCipher.end(), '.'), tempCipher.end());
+      float row = password.length();
+      int col = std::ceil(float(cipherText.length())/row);
+      int text_length = tempCipher.length() - row;
+      if (text_length < 0) {
+        text_length = -text_length;
+      } else if (text_length == 0) {
+        text_length = row;
+      }
+      char array[int(row)][col];
+      for (int c=0, t=0; c < col; c++) {
+        for (int r=0; r < row; r++) {
+            array[r][c] = tempCipher[t];
+            t++;
+        }
+      }
+      std::string plainText;
+      int rw = 0, w = 0;
+      while (w < text_length) {
+        for (int c = 0; c < col; c++) {
+            if (array[rw][c] == '^') {
+                plainText += ' ';
+            } else {
+                plainText += array[rw][c];
+            }
+            w++;
+            if (w == text_length) {
+                break;
+            }
+        }
+        rw++;
+      }
       return plainText;
    }
 };
