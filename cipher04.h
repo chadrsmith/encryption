@@ -17,6 +17,15 @@ using namespace std;
  *******************************************************************/
 class Cipher04 : public Cipher
 {
+private:
+   char matrix1[25] = {'a','b','c','d','e','f','g','h','i','j','k','l',
+                       'm','n','o','p','r','s','t','u','v','w','x','y','z'};
+   char matrix2[25] = {'t','h','e','q','u','i','k','b','r','o','n',
+                       'f','o','x','j','u','m','p','s','o','v','e','r','t','h'};
+   char matrix3[25] = {'z','y','x','w','v','u','t','s','r','q','p','o','n',
+                       'm','l','k','i','h','g','f','e','d','c','b','a'};
+   char matrix4[25] = {'a','b','c','d','e','f','g','h','i','k','l',
+                       'm','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 public:
    virtual std::string getPseudoAuth()  { return "Chad Smith"; }
    virtual std::string getCipherName()  { return "Foursquare"; }
@@ -29,7 +38,7 @@ public:
     ***********************************************************/
    virtual std::string getCipherCitation()
    {
-      return std::string("citation");
+      return std::string("L. Rombert, “Four Square Cipher,” Privacy Canada, 16-Mar-2021. [Online]. Available: https://privacycanada.net/classical-encryption/four-square-cipher/. [Accessed: 02-Apr-2021]. ");
    }
 
    
@@ -71,73 +80,81 @@ public:
    virtual std::string getPseudocode()
    {
       std::string str;
+      // The encryptCase pseudocode
+       str =  "\n";
+       str += "function fourByFourEncrypt(password) =>\n";
+       str += "string cipherText \n";
+       str += "\n";
+       str += "// replace spaces \n";
+       str += "password.split(' ', '') \n";
+       str += "\n";
+       str += "// add z if the password length is odd \n";
+       str += "if password % 2 !== 0 \n";
+       str += "   password += 'z' \n";
+       str += "\n";
+       str += "// encrypt plain text \n";
+       str += "for i=0; i < password.length; i+=2 -> \n";
+       str += "    // get index for letters in matrix1 and matrix4 \n";
+       str += "    index1 = getIndex(password[i], matrix1) \n";
+       str += "    index2 = getIndex(password[i + 1], matrix4) \n";
+       str += "    // get x and y coordinates of indexes for their matrixes \n";
+       str += "    x1 = getXCoordinate(index1) \n";
+       str += "    y1 = getYCoordinate(index1) \n";
+       str += "    x2 = getXCoordinate(index2) \n";
+       str += "    y2 = getYCoordinate(index2) \n";
+       str += "    cipherText += matrix2[x2 + y1] \n";
+       str += "    cipherText += matrix3[x1 + y2] \n";
+       str += "RETURN cipherText; \n";
+       str += "\n";
+       
+       // Helper function
+       str += "// Gets the index of the character in the matrix \n";
+       str += "INT getIndex(character, matrix) { \n";
+       str += "    int index; \n";
+       str += "    FOR each character in Matrix\n";
+       str += "            if matrix[x] IS EQUAL TO character \n";
+       str += "                index<-matrix\n";
+       str += "                BREAK;\n";
+       str += "    return index \n";
+       str += "} \n";
+       str += "\n";
+       
+       // Helper Function
+       str += " // get y-coordinate of the index in a 5 x 5 matrix \n";
+       str += "INT getXCoordinate(index) => { \n";
+       str += "    RETURN index % 5; \n";
+       str += "} \n";
+       str += "\n";
 
-      // TODO: please format your pseudocode
-      // The encrypt pseudocode
-      str =  "insert the encryption pseudocode\n";
-
-//   str =  "\n"
-//     "function fourByFourEncrypt(password) =>\n"
-//        "array matrix1 // matrix without 'Q' \n"
-//        "array matrix2 // key matrix \n"
-//        "array martrix3 // matrix without 'J' \n"
-//        "array matrix4 // key matrix \n"
-//        "array cipherText \n"
-//        "\n"
-//        "// replace spaces \n"
-//        "password.split(' ', '') \n"
-//        "\n"
-//        "// add z if the password length is odd \n"
-//        "if password % 2 !== 0 \n"
-//        "password += 'z' \n"
-//        "\n"
-
-
-//        "// encrypt plain text \n"
-//        "for i=0; i < password.length; i+=2 -> \n"
-//        "    // get index for letters in matrix1 and matrix4 \n"
-//        "    index1 = getIndex(password[i], matrix1) \n"
-//        "    index2 = getIndex(password[i + 1], matrix4) \n"
-//        "    // get x and y coordinates of indexes for their matrixes \n"
-//        "    x1 = getXCoordinate(index1) \n"
-//        "    y1 = getYCoordinate(index1) \n"
-//        "    x2 = getXCoordinate(index2) \n"
-//        "    y2 = getYCoordinate(index2) \n"
-//        "    cipherText += getEncryptedLetter(x2, y1, matrix2) \n"
-//        "    cipherText += getEncryptedLetter(x1, y2, matrix3) \n"
-//        "return cipherText; \n"
-//        "\n"
-//        "// Gets the index of the character in the matrix \n"
-//        "function getIndex(character, matrix) => { \n"
-//        "    int index; \n"
-//        "    for x=0; x < matrix; x++ -> \n"
-//        "            if matrix[x] == character \n"
-//        "                index = matrix \n"
-//        "                break \n"
-//        "    return index \n"
-//        "} \n"
-//        "\n"
-//        " // get y-coordinate of the index in a 5 x 5 matrix \n"
-//        "function getXCoordinate(index) => { \n"
-//        "    return index % 5; \n"
-//        "} \n"
-//        "\n"
-//        "// gets the y-coordinate of the index in 5 x 5 matrix \n"
-//        "function getYCoordinate(index) => { \n"
-//        "     // divide by 5 and round down \n"
-//        "    return Math.floor((index / 5)) \n"
-//        "} \n"
-//        "\n"
-//        "// Returns the index for the encryption table \n"
-//        "function getEncryptedLetter(x, y, matrix) => { \n"
-//        "    int index = y + x; \n"
-//        "    return matrix[index] \n"
-//        "} \n";
-
-
-      // The decrypt pseudocode
-      str += "insert the decryption pseudocode\n";
-
+       // Helper Function
+       str += "// gets the y-coordinate of the index in 5 x 5 matrix \n";
+       str += "INT getYCoordinate(index) { \n";
+       str += "    return floor((index / 5)) \n";
+       str += "} \n";
+       str += "\n";
+       str += "// Returns the index for the encryption table \n";
+       str += "function getEncryptedLetter(x, y, matrix) => { \n";
+       str += "    int index = y + x; \n";
+       str += "    return matrix[index] \n";
+       str += "} \n";
+   
+       str += "The Decrypt psuedocode \n";
+       str += "function decryptFourByFour(encryptedPassword) => {\n";
+       str += "decryptedText; \n";
+       str += "// decrypt encrypted text \n";
+       str += "for i=0; i < password.length; i+=2 => \n";
+       str += "    // get index for letters in matrix1 and matrix4 \n";
+       str += "    index1 = getIndex(password[i], matrix2) \n";
+       str += "    index2 = getIndex(password[i + 1], matrix3) \n";
+       str += "    // get x and y coordinates of indexes for their matrixes \n";
+       str += "    x1 = getXCoordinate(index2) \n";
+       str += "    y1 = getYcoordinate(index1) \n";
+       str += "    x2 = getXCoordinate(index1) \n";
+       str += "    y2 = getYCoordinate(index2) \n";
+       str +=  "    decryptedText += getEncryptedLetter(x1, y1, matrix1) \n";
+       str += "    decryptedText += getEncryptedLetter(x2, y2, matrix4) \n";
+       str += "    return decryptedText; \n";
+       str += "}\n";
       return str;
    }
 
@@ -145,57 +162,37 @@ public:
 
    /**********************************************************
     * ENCRYPT
-    * TODO: ADD description
+    * Uses the four by four method to encrypt the plaintext
     **********************************************************/
    virtual std::string encrypt(const std::string & plainText,
                                const std::string & password)
   {
       std::string cipherText = plainText;
-      // TODO - Add your code here
-      char matrix1[25] = {'a','b','c','d','e','f','g','h','i','j','k','l',
-                          'm','n','o','p','r','s','t','u','v','w','x','y','z'};
-      char matrix2[25] = {'t','h','e','q','u','i','k','b','r','o','n',
-                          'f','o','x','j','u','m','p','s','o','v','e','r','t','h'};
-      char matrix3[25] = {'z','y','x','w','v','u','t','s','r','q','p','o','n',
-                          'm','l','k','i','h','g','f','e','d','c','b','a'};
-      char matrix4[25] = {'a','b','c','d','e','f','g','h','i','k','l',
-                          'm','n','o','p','q','r','s','t','u','v','w','x','y','z'}; 
-       
-
-      // Traverse the given string. If current character
-      // is not space, it is filtered out
-
+      
+      // Filters out spaces in the string 
       std::string::iterator end_pos = std::remove(cipherText.begin(), cipherText.end(), ' ');
       cipherText.erase(end_pos, cipherText.end());
-      if (cipherText.length() % 2 != 0) {
-         cipherText += 'z';
-         }
       
-      int index1 = 0;
-      int index2 = 0;
-      int x1 = 0;
-      int y1 = 0;
-      int x2 = 0;
-      int y2 = 0;
-
+      // The text must be even for the encryption to work. if odd add Z at the end
+      if (cipherText.length() % 2 != 0)
+         cipherText += 'z';
+      
       string encrypted = "";
-
       for(int i = 0; i < cipherText.length(); i += 2) {
-         index1 = getIndex(cipherText[i], matrix1);
-         index2 = getIndex(cipherText[i + 1], matrix4);
-         x1 = getXCoordinate(index1);
-         y1 = getYCoordinate(index1);
-         x2 = getXCoordinate(index2);
-         y2 = getYCoordinate(index2);
+         int index1 = getIndex(cipherText[i], this->matrix1);
+         int index2 = getIndex(cipherText[i + 1], this->matrix4);
+         int x1 = getXCoordinate(index1);
+         int y1 = getYCoordinate(index1);
+         int x2 = getXCoordinate(index2);
+         int y2 = getYCoordinate(index2);
 
-
-         encrypted += matrix2[x2+y1];
-         encrypted += matrix3[x1+y2];       
+         encrypted += this->matrix2[x2+y1];
+         encrypted += this->matrix3[x1+y2];
          }
 
       return encrypted;
-
   }
+
 
    /**********************************************************
     * DECRYPT
