@@ -69,8 +69,8 @@ public:
    virtual std::string encrypt(const std::string & plainText,
                                const std::string & password)
    {
-      std::string cipherText;
-      std::string totalAlphabet = "abcdefghijklmnopqrstuvwxyz";
+      std::string cipherText = "";
+      std::string totalAlphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ !\"#$%&'()*+-,./:;<=>?@[]\\^_{}0123456789";
 
       for (int i = 0, p = 0, k = 0; i < plainText.length(); i++) {
             p = totalAlphabet.find(plainText[i]);
@@ -87,11 +87,20 @@ public:
    virtual std::string decrypt(const std::string & cipherText,
                                const std::string & password)
    {
-      std::string plainText = cipherText;
-      // TODO - Add your code here
+      std::string plainText = "";
+       std::string totalAlphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ !\"#$%&'()*+-,./:;<=>?@[]\\^_{}0123456789";
+
+       for (int i = 0, p = 0, k = 0; i < cipherText.length(); i++) {
+             p = totalAlphabet.find(cipherText[i]);
+             k = totalAlphabet.find(password[i % password.length()]);
+           if(p > k)
+           {
+               p += totalAlphabet.length();
+           }
+           plainText += totalAlphabet[(p - k) % totalAlphabet.length()];
+       }
       return plainText;
    }
 };
 
 #endif // CIPHER03_H
-

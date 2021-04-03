@@ -16,8 +16,8 @@ class Cipher01 : public Cipher
 {
 public:
    virtual std::string getPseudoAuth()  { return "Ryan Budd"; }
-   virtual std::string getCipherName()  { return "Transport Cipher"; }
-   virtual std::string getEncryptAuth() { return "encrypt author"; }
+   virtual std::string getCipherName()  { return "Transposition Cipher"; }
+   virtual std::string getEncryptAuth() { return "Doug Barlow"; }
    virtual std::string getDecryptAuth() { return "Chad Smith"; }
 
    /***********************************************************
@@ -31,7 +31,6 @@ public:
       s += "[Online]Available: https://privacycanada.net/classical-encryption/transposition-ciphers/";
       return s;
    }
-
    /**********************************************************
     * GET PSEUDOCODE
     * Returns the pseudocode as a string to be used by the caller.
@@ -45,13 +44,10 @@ public:
       str += "  row <- password.length()\n";
       str += "  col <- ceil((plainText.length()+row)/row)\n";
       str += "  array[row][col]\n";
-      str += "  FOR r is all values of row, t is all values of plainText, and p is all values of password\n";
+      str += "  FOR r is all values of row, t is all values of plainText\n";
       str += "    FOR c is all values of col\n";
       str += "      IF t is equal to NULL\n";
-      str += "        IF p is equal to NULL\n";
       str += "          array <- .\n";
-      str += "        ELSE array <- p\n";
-      str += "          increment p\n";
       str += "      ELSE\n";
       str += "        IF t is equal to space\n";
       str += "          array <- ^\n";
@@ -65,7 +61,6 @@ public:
       // The decrypt pseudocode
       str += "decrypt(cypherText, password)\n";
       str += "  temp <- cypherText\n";
-      str += "  temp.erase(remove(temp.begin(), temp.end(), \'.\'), temp.end())\n";
       str += "  row <- password.length()\n";
       str += "  col <- ceil(temp/row)\n";
       str += "  originalLength <- temp - row\n";
@@ -87,6 +82,7 @@ public:
       str += "      IF w is equal to originalLength\n";
       str += "        BREAK\n";
       str += "    increment rw\n";
+      str += "  plainText.erase(remove(plainText.begin(), plainText.end(), \'.\'), plainText.end())\n";
       str += "  RETURN plainText\n\n";
 
       return str;
@@ -99,8 +95,38 @@ public:
    virtual std::string encrypt(const std::string & plainText,
                                const std::string & password)
    {
-      std::string cipherText = plainText;
-      // TODO - Add your code here
+        std::string cipherText = "";
+
+        int row = password.length();
+        int col = std::ceil((plainText.length() + row)/row);
+        char myArray[row][col];
+        int t = 0;
+        for (int r = 0; r < row; r++){
+            for (int c = 0; c < col; c++){
+                if (t >= plainText.length()){
+                    myArray[r][c] = '.';
+                } else {
+                    if (plainText.at(t) == ' '){
+                        myArray[r][c] = '^';
+                    } else {
+                        myArray[r][c] = plainText.at(t);
+                    }
+                    t++;
+                }
+            }
+        }
+        std::cout << "\nDataGrid\n";
+        for (int c = 0; c < col; c++){
+            for (int r = 0; r < row; r++){
+                cipherText += myArray[r][c];
+            }
+        }
+        for (int c = 0; c < row; c++){
+            for (int r = 0; r < col; r++){
+                std::cout << myArray[c][r] << " ";
+            }
+            std::cout << "\n";
+        }
 
       return cipherText;
    }
@@ -112,12 +138,10 @@ public:
     virtual std::string decrypt(const std::string & cipherText,
                                const std::string & password)
    {
-      //std::string plainText = cipherText;
       std::string tempCipher = cipherText;
-      tempCipher.erase(std::remove(tempCipher.begin(), tempCipher.end(), '.'), tempCipher.end());
       float row = password.length();
       int col = ceil(float(cipherText.length())/row);
-      int text_length = tempCipher.length() - row;
+      int text_length = tempCipher.length();// - row;
       if (text_length < 0) {
         text_length = -text_length;
       } else if (text_length == 0) {
@@ -146,6 +170,7 @@ public:
         }
         rw++;
       }
+      plainText.erase(std::remove(plainText.begin(), plainText.end(), '.'), plainText.end());
       return plainText;
    }
 };
