@@ -11,23 +11,17 @@
  *******************************************************************/
 class Cipher02 : public Cipher
 {
-private:
-   char valueMinimum;
-   char valueMaximum;
-   int sizeAlphabet;
 public:
-
    Cipher02()
    {
-      this->valueMinimum = ' ';
-      this->valueMaximum = '~';
-      this->sizeAlphabet = valueMaximum - valueMinimum;
+      valueMinimum = ' ';
+      valueMaximum = '~';
+      sizeAlphabet = valueMaximum - valueMinimum;
    }
-   
-   virtual std::string getPseudoAuth() { return "Doug Barlow"; }
-   virtual std::string getCipherName() { return "AutoKey Cipher"; }
+   virtual std::string getPseudoAuth()  { return "Doug Barlow"; }
+   virtual std::string getCipherName()  { return "AutoKey Cipher"; }
    virtual std::string getEncryptAuth() { return "Chad Smith"; }
-   virtual std::string getDecryptAuth() { return "decrypt author"; }
+   virtual std::string getDecryptAuth() { return "Charles Rich"; }
 
    /***********************************************************
     * GET CIPHER CITATION
@@ -35,7 +29,7 @@ public:
     ***********************************************************/
    virtual std::string getCipherCitation()
    {
-      return std::string("Ã¬Autokey Cipher,Ã® Crypto Corner. [Online]. Available: https://crypto.interactive-maths.com/autokey-cipher.html.\n [Accessed: 01-Apr-2021].\n");
+      return std::string("“Autokey Cipher,” Crypto Corner. [Online]. Available: https://crypto.interactive-maths.com/autokey-cipher.html.\n [Accessed: 01-Apr-2021].\n");
    }
 
    /**********************************************************
@@ -47,13 +41,14 @@ public:
       std::string str;
 
       // The encryptCase pseudocode
-      str = "encrypt(plainText, password)\n";
+      str =  "encrypt(plainText, password)\n";
       str += "   key <- password + plainText";
       str += "   iterator <- 0";
       str += "   FOR p is all values of plainText\n";
       str += "      offset <- indexFromCharacter(key[iterator])\n";
-      str += "      index <- (indexFromCharacter(*p) + offset) % size\n";
-      str += "      cipherText += characterFromIndex(index)\n";
+      str += "      index <- (alphabetSize)\n";
+      str += "      index += (indexFromCharacter(*p) + offset) \n";
+      str += "      cipherText += characterFromIndex(index % alphabetSize)\n";
       str += "   RETURN cipherText\n\n";
 
       // The decryptCase pseudocode
@@ -61,9 +56,10 @@ public:
       str += "   key <- password";
       str += "   iterator <- 0";
       str += "   FOR p is all values of cipherText\n";
-      str += "      offset <- indexFromCharacter(key[iterator])\n";
-      str += "      index <- (indexFromCharacter(*p) - offset) % size\n";
-      str += "      plainChar <- characterFromIndex(index)\n";
+      str += "      offset <- indexFromCharacter(key[iterator++])\n";
+      str += "      index <- (alphabetSize)\n";
+      str += "      index <- (indexFromCharacter(*p) - offset)\n";
+      str += "      plainChar <- characterFromIndex(index % alphabetSize)\n";
       str += "      plainText += plainChar\n";
       str += "      key += plainChar\n";
       str += "   RETURN plainText\n\n";
@@ -86,45 +82,23 @@ public:
 
       return str;
    }
-   
-   /**********************************************************
-    * INDEXFROMCHARACTER
-    ***********************************************************/
-   virtual int indexFromCharacter(char letter) {
-      if (letter < this->valueMinimum && letter > this->valueMaximum) {
-         int index = letter - this->valueMinimum;
-         return index;
-      } else {
-         return 0;
-      }
-   }
-   
-   /**********************************************************
-    * CHARACTERFROMINDEX
-    ***********************************************************/
-   virtual char characterFromIndex(int index) {
-      if (index < this->sizeAlphabet && index > 0) {
-         char character = index + this->valueMinimum;
-         return character;
-      } else {
-         return ' ';
-      }
-   }
 
    /**********************************************************
     * ENCRYPT
-    * 
+    * TODO: ADD description
     **********************************************************/
    virtual std::string encrypt(const std::string & plainText,
       const std::string & password)
    {
-      std::string cipherText = plainText;
-      int iterator = 0;
-      
-      for (int i = 0; i < cipherText.length(); i++) {
-         int offset = this->indexFromCharacter(cipherText[iterator]);
-         int index = (indexFromCharacter(password[i]) + offset) % cipherText.length();
-         cipherText += this->characterFromIndex(index);
+
+      std::string key = password + plainText;
+      std::string cipherText = "";
+
+      for (int i = 0; i < plainText.length(); i++) {
+         int offset = this->indexFromCharacter(key[i]);
+         int index = this->sizeAlphabet;
+         index += (indexFromCharacter(plainText[i]) + offset);
+         cipherText += this->characterFromIndex(index % this->sizeAlphabet);
       }
       return cipherText;
    }
@@ -134,14 +108,53 @@ public:
     * TODO: ADD description
     **********************************************************/
    virtual std::string decrypt(const std::string & cipherText,
-      const std::string & password)
+                               const std::string & password)
    {
-      std::string plainText = cipherText;
-      // TODO - Add your code here
-      return plainText;
+        std::string plainChar = "";
+        std::string plainText = "";
+        std::string key = password;
+        for( int i = 0; i < cipherText.length(); i++){
+            int offset = indexFromCharacter(key[i]);
+            int index = this->sizeAlphabet;
+            index += (indexFromCharacter(cipherText[i]) - offset);
+            plainChar = characterFromIndex(index % this->sizeAlphabet);
+            plainText += plainChar;
+            key += plainChar;
+        }
+        return plainText;
    }
+
+private:
+   /**************************************************
+    * INDEX FROM CHARACTER
+    * Get an index value from a given letter.
+    *************************************************/
+   int indexFromCharacter(char letter)
+   {
+      // return the value
+      if (letter > valueMaximum || letter < valueMinimum)
+         return 0;
+      else
+         return (int)(letter - valueMinimum);
+   }
+
+   /**************************************************
+    * CHARACTER FROM INDEX
+    * Get the characer value from a given index.
+    *************************************************/
+   char characterFromIndex(int index)
+   {
+      if (index >= 0 && index < sizeAlphabet)
+         return (char)(index + valueMinimum);
+      else
+         return ' ';
+   }
+
+   // minimum "printable" character
+   char valueMinimum;
+   // maximum "printable" character
+   char valueMaximum;
+   int sizeAlphabet;
 };
 
 #endif // CIPHER02_H
-
-
